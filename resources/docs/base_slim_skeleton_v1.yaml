@@ -1,0 +1,206 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: API du restaurant DavyPoutine
+  description: API de gestion d'une liste de poutines du restaurant. Réalisé dans le cadre du cours Services Web au Cégep de Victoriaville.
+  
+servers: 
+  - url: http://http://127.0.0.1/final-api/
+paths:
+  /:
+    get:
+      tags:
+        - Général
+      summary: Message de bienvenue
+      responses:
+        '200': 
+          description: Un petit message de bienvenue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                    message : 'Services Web H2023 - Epreuve finale'
+  
+  /cle:
+    get:
+      tags:
+        - Cle
+      summary: Genere une nouvelle cle d'api pour l'utilisateur
+      parameters:
+        - in: body
+          name: codeUsager
+          schema:
+            type: string
+            example: mathieu
+          required: true
+          description: Le code usager d'un utilisateur dans la base de donnees
+        - in: body
+          name: motDePasse
+          required: true
+          description: Le mot de passe d'un utilisateur dans la base de donnees
+          schema:
+            type: string
+            example: bierre
+
+      responses:
+        '200': 
+          description: La nouvelle cle d'api
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cleApi:
+                    type: string
+                    example: b99317e938e47264f28d748a4e6adf84fa45a9ce
+
+  /poutine:
+    get:
+      tags:
+        - Poutine
+      summary: Affiche la liste de tous les poutines
+
+      responses:
+        '200': 
+          description: Un tableau de poutines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  movies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Poutine'
+                    example: [{"id": "1","nom": "Poutine originale","description": ""}, {"id": "2","nom": "Poutine italienne","description": "Sauce a spaghetti"}]
+                    
+    post:
+      tags: 
+        - Poutine
+      summary: Ajoute une Poutine.
+      requestBody:
+        description: Les informations de la Poutine à créer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PoutineSansId'
+      responses:
+        '201': 
+          description: Les informations de la poutine cree
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poutine'
+
+  /poutine/{id}:
+    get:
+      tags:
+        - Poutine
+      summary: Affiche une poutine selon son id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Le id de la poutine à afficher
+          schema:
+            type: integer
+            example: 1
+
+      responses:
+        '200': 
+          description: La poutine à afficher
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poutine'
+        '404': 
+          description: La poutine à afficher n'est pas trouvé
+          content:
+            application/json:
+              schema:
+                type: object
+                
+    put:
+      tags: 
+        - Poutine
+      summary: Modifie une poutine.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Le id de la poutine à modifier
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        description: Les informations de la poutine à modifier, toutes les informations doivent être transmise, même si elle ne sont pas à modifier.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Poutine'
+      responses:
+        '200': 
+          description: La poutine a été créée car elle n'existait pas dans la base de données
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poutine'
+        '201': 
+          description: La poutine a été modifiée selon les informations requises
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Film'
+                
+    delete:
+      tags:
+        - Poutine
+      summary: Supprime une poutine
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Le id de la poutine à supprimer
+          schema:
+            type: integer
+            example: 1
+
+      responses:
+        '200': 
+          description: La poutine a été supprimée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poutine'
+        '404': 
+          description: La poutine à supprimer n'a pas été trouvée
+          content:
+            application/json:
+              schema:
+                type: object
+
+
+components:
+  schemas:
+    
+    Poutine:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nom:
+          type: string
+        description:
+          type: string
+
+      example:
+          id: 2
+          nom: "Poutine italienne"
+          description: "Sauce a spaghetti"
