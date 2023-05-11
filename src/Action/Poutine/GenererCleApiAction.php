@@ -20,12 +20,15 @@ final class GenererCleApiAction
         ResponseInterface $response
     ): ResponseInterface {
 
-        // Récupération du contenu du body de la HTTP Request
-        $jsonInput = $request->getParsedBody();
-
-        //Parse JSON
-        $codeUsager = $jsonInput["codeUsager"] ?? "";
-        $motDePasseInput = $jsonInput["motDePasse"] ?? "";
+        // Récupération du contenu dans le Header 'Authorization'.
+        $valeurAuthorization = $request->getHeaderLine('Authorization');
+        $token = explode(' ', $valeurAuthorization)[1];
+        
+        //Decoder usager et mot de passe.
+        $decodedToken = base64_decode($token);
+        
+        $codeUsager = explode(' ', $decodedToken)[0] ?? "";
+        $motDePasseInput = explode(' ', $decodedToken)[1] ?? "";
 
         $resultat = $this->genererCleApiView->authentificationEtCleApi($codeUsager, $motDePasseInput);
 
